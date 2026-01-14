@@ -1,0 +1,25 @@
+configfile: "snake_config.yaml"
+
+rule target_all:
+    input:
+        config["output_bed"]
+
+
+rule create_file_slowly:
+    input:
+        config["bed_file"],
+        config["bim_file"],
+        config["fam_file"]
+    output:
+        f = config["output_bed"]
+    params:
+        plink = "./plink",
+        maf = config["maf"],
+        geno = config["genotype_missingness"],
+        bed_pattern = config["bed_file"].split(".")[0],
+        out_pattern = config["output_bed"].split(".")[0]
+    threads:
+        1
+    shell:
+        "{params.plink} --bfile {params.bed_pattern} --maf {params.maf}"
+        " --geno {params.geno} --make-bed --out {params.out_pattern}"

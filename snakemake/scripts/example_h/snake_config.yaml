@@ -1,0 +1,8 @@
+bed_file: "input_files/input.bed"
+bim_file: "input_files/input.bim"
+fam_file: "input_files/input.fam"
+
+output_bed: "output_files/output.bed"
+
+maf: 0.05
+genotype_missingness: 0.01

@@ -1,0 +1,20 @@
+rule target_all:
+    input:
+        "full-squared.tsv"
+
+rule generate_data:
+    input:
+        e = "empty.csv"
+    output:
+        f = "full.tsv"
+    script:
+        "script_a.py"
+
+
+rule square_data:
+    input:
+        n = "full.tsv"
+    output:
+        s = "full-squared.tsv"
+    script:
+        "script_b.py"

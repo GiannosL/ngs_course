@@ -1,0 +1,39 @@
+configfile: "snake_config.yaml"
+
+rule target_all:
+    input:
+        config["out_file"],
+        config["out_file_2"]
+
+
+rule generate_data:
+    input:
+        e = config["input_file"]
+    output:
+        f = "full.tsv"
+    threads:
+        1
+    script:
+        "script_a.py"
+
+
+rule multiply_data:
+    input:
+        n = "full.tsv"
+    output:
+        s = config["out_file"]
+    params:
+        multiplier = config["multiplier"]
+    threads:
+        1
+    script:
+        "script_b.py"
+
+
+rule create_file_slowly:
+    output:
+        f = config["out_file_2"]
+    threads:
+        1
+    script:
+        "script_c.py"

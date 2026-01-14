@@ -1,0 +1,39 @@
+configfile: "snake_config.yaml"
+
+rule target_all:
+    input:
+        config["out_file"]
+
+
+rule multiply_data:
+    input:
+        n = config["input_file"]
+    output:
+        s = "temporary/temp_{number}.csv"
+    params:
+        multiplier = config["multiplier"]
+    threads:
+        1
+    script:
+        "script_b.py"
+
+
+rule concatenate_chromosomes:
+    input:
+        temp_files = expand("temporary/temp_{number}.csv", number=[1, 2, 3])
+    output:
+        out_file = config["out_file"]
+    threads:
+        1
+    run:
+        import pandas as pd
+
+        dataframes = []
+        for file in input.temp_files:
+            df = pd.read_csv(file, sep=",")
+            dataframes.append(df)
+        
+        final_df = pd.concat(dataframes)
+
+        final_df.to_csv(output.out_file, index=False, sep="\t")
+        

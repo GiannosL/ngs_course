@@ -1,0 +1,23 @@
+rule target_all:
+    input:
+        "full-multiplied.tsv"
+
+
+rule generate_data:
+    input:
+        e = "empty.csv"
+    output:
+        f = "full.tsv"
+    script:
+        "script_a.py"
+
+
+rule multiply_data:
+    input:
+        n = "full.tsv"
+    output:
+        s = "full-multiplied.tsv"
+    params:
+        multiplier = 3
+    script:
+        "script_b.py"

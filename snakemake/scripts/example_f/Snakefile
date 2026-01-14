@@ -1,0 +1,25 @@
+configfile: "snake_config.yaml"
+
+rule target_all:
+    input:
+        config["out_file"]
+
+
+rule generate_data:
+    input:
+        e = config["input_file"]
+    output:
+        f = "full.tsv"
+    script:
+        "script_a.py"
+
+
+rule multiply_data:
+    input:
+        n = "full.tsv"
+    output:
+        s = config["out_file"]
+    params:
+        multiplier = config["multiplier"]
+    script:
+        "script_b.py"

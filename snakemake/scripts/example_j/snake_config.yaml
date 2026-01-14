@@ -1,0 +1,4 @@
+input_file: "input_data/chromosome_{number}.csv"
+out_file: "output_data/all_chromosomes.tsv"
+
+multiplier: 3

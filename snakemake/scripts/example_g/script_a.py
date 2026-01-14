@@ -1,0 +1,12 @@
+with open(snakemake.input.e, "r") as f:
+    f = f.read()
+    f = f.splitlines()
+
+header = f[0].split(",")
+numbers = range(1, 28)
+
+final_data = [*header, *numbers]
+
+with open(snakemake.output.f, "w+") as o:
+    for i in range(0, 30, 3):
+        o.write(f"{final_data[i]}\t{final_data[i+1]}\t{final_data[i+2]}\n")
