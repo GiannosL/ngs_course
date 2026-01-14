@@ -7,3 +7,4 @@ Here you will be able to find the exercise material for in-class exercises, supp
 Lectures:
 
 * [Genotype Imputation](imputation/)
+* [Snakemake](snakemake/)
