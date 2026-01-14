@@ -1,0 +1,72 @@
+configfile: 'config_low_maf.yaml'
+
+
+rule target:
+    input:
+        [f'batches/filtered_{i}.tsv' for i in range(config['batch_number'])],
+
+
+rule generate_diagnosis_codes:
+    output:
+        my_file = 'output_data/diagnosis1.tsv',
+    params:
+        my_script = config['gen_icd'],
+    shell:
+        'python {params.my_script} --out_file {output.my_file}'
+
+
+rule generate_medication_codes:
+    output:
+        my_file = 'output_data/medication1.tsv',
+    params:
+        my_script = 'src/generate_atc.py'
+    shell:
+        'python {params.my_script} --out_file {output.my_file}'
+
+
+rule merge_datasets:
+    input:
+        diagnosis_file = rules.generate_diagnosis_codes.output.my_file,
+        medication_file = rules.generate_medication_codes.output.my_file,
+    output:
+        my_file = 'output_data/merged.tsv',
+    shell:
+        'python src/combine_datasets.py'
+        ' --icd_file {input.diagnosis_file}'
+        ' --atc_file {input.medication_file}'
+        ' --out_file {output.my_file}'
+
+
+
+
+rule filter_patients:
+    input:
+        batch_file = 'batches/batch_{batch_id}.tsv',
+    output:
+        my_file = 'batches/filtered_{batch_id}.tsv',
+    params:
+        my_date = '2023-09-01',
+    run:
+        import pandas as pd
+
+        df = pd.read_csv(input.batch_file, sep='\t')
+        df['episode_start'] = pd.to_datetime(df['episode_start'])
+
+        # filter out anything after 2023
+        df = df[df['episode_start'] <= pd.to_datetime(params.my_date)]
+        # save output
+        df.to_csv(output.my_file, sep='\t', index=False)
+
+rule split_patients:
+    input:
+        merged_data = rules.merge_datasets.output.my_file,
+    output:
+        [f'batches/batch_{i}.tsv' for i in range(config['batch_number'])],
+    params:
+        batch_n = config['batch_number'],
+        batch_directory = 'batches/'
+    shell:
+        'python src/split_by_patient_batches.py'
+        ' --input_file {input.merged_data}'
+        ' --num_batches {params.batch_n}'
+        ' --output_dir {params.batch_directory}'
